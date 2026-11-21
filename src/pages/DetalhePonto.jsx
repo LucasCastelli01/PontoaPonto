@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
+
 
 function DetalhePonto() {
     const { id } = useParams();
@@ -26,6 +28,7 @@ function DetalhePonto() {
         <>
             <h1>Detalhes do ponto</h1>
             {ponto && <p>{ponto.name}, {ponto.description}, {ponto.latitude}, {ponto.longitude}</p>}
+            <Link to="/pontos">voltar</Link>
         </>
         
     );
