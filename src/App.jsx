@@ -1,5 +1,6 @@
 import { Link, Navigate, Route, Routes } from 'react-router-dom'
 import Cabecalho from './components/Cabecalho.jsx'
+import ListaPontos from './pages/ListaPontos.jsx'
 import './App.css'
 
 function App() {
@@ -12,8 +13,7 @@ function App() {
           <>
             <Cabecalho />
             <main>
-              <h1>Seus pontos</h1>
-              <p>Gerencie seus locais salvos.</p>
+              <ListaPontos />
             </main>
 
           </>
