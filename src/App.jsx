@@ -2,6 +2,7 @@ import { Link, Navigate, Route, Routes } from 'react-router-dom'
 import Cabecalho from './components/Cabecalho.jsx'
 import ListaPontos from './pages/ListaPontos.jsx'
 import DetalhePonto from './pages/DetalhePonto.jsx'
+import NovoPonto from './pages/NovoPonto.jsx'
 import './App.css'
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Navigate to="/pontos" replace />} />
       <Route path="/pontos/:id" element={<DetalhePonto />} />
+      <Route path="/pontos/novo" element={<NovoPonto />} />
       <Route
         path="/pontos"
         element={
