@@ -10,11 +10,31 @@ function NovoPonto(){
     const [longitude, setLongitude] = useState("");
     const [latitude, setLatitude] = useState("");
     
-    function cadastrarPonto(e){
+    async function cadastrarPonto(e){
         e.preventDefault()
-        console.log("Enviando formulário...")
-    }
+        const novoPonto = {
+            name: nome,
+            description: descricao,
+            latitude: Number(latitude),
+            longitude: Number(longitude)
+        };
 
+        console.log(novoPonto)
+
+            const resposta = await fetch("https://geopoint-6x4u.onrender.com/api/points", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(novoPonto)
+            }) 
+
+            if (!resposta.ok) {
+                console.log("Erro ao cadastrar ponto");
+                return;
+            }
+            
+        console.log("Enviando formulário...")
+    
+    }
     return (<> 
     
         <h1>Cadastrar novo ponto</h1>
