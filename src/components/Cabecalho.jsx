@@ -12,7 +12,7 @@ function Cabecalho() {
       <nav aria-label="Navegação principal">
         <Link to="/pontos">Pontos</Link>
         <span className="separador-nav" aria-hidden="true">•</span>
-        <span>Gerenciar locais</span>
+        <Link to="/pontos">Gerenciar locais</Link>
       </nav>
     </header>
   )
