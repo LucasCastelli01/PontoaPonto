@@ -1,38 +1,56 @@
-import { useState } from "react";
-import { useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { Link } from "react-router-dom";
-
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { buscarPonto, excluirPonto } from "../services/api.js";
+import MapaDecorativo from "../components/MapaDecorativo.jsx";
 
 function DetalhePonto() {
-    const { id } = useParams();
-    const [ponto, setPonto] = useState(null);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [ponto, setPonto] = useState(null);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState("");
 
-    useEffect(() => {
-    buscarPonto();
-    }, []);
+  useEffect(() => {
+    let ativo = true;
+    buscarPonto(id)
+      .then((dados) => { if (ativo) setPonto(dados); })
+      .catch((error) => { if (ativo) setErro(error.message || "Não foi possível carregar o ponto."); })
+      .finally(() => { if (ativo) setCarregando(false); });
+    return () => { ativo = false; };
+  }, [id]);
 
-    async function buscarPonto() {
-    const resposta = await fetch(`https://geopoint-6x4u.onrender.com/api/points/${id}`);
-    if (!resposta.ok){
-        console.log("Erro 404")
-        return 
+  async function handleExcluir() {
+    if (!window.confirm(`Deseja excluir o ponto "${ponto.name}"?`)) return;
+    try {
+      await excluirPonto(id);
+      navigate("/pontos", { replace: true });
+    } catch (error) {
+      setErro(error.message || "Não foi possível excluir o ponto.");
     }
-    const dados = await resposta.json();
-    setPonto(dados  )
-        
-    }
+  }
 
+  if (carregando) return <section className="pagina"><p className="aviso">Carregando ponto...</p></section>;
+  if (erro && !ponto) return <section className="pagina"><p className="aviso aviso-erro" role="alert">{erro}</p><Link className="botao botao-secundario" to="/pontos">Voltar para os pontos</Link></section>;
+  if (!ponto) return null;
 
-    return (
-        <>
-            <h1>Detalhes do ponto</h1>
-            {ponto && <p>{ponto.name}, {ponto.description}, {ponto.latitude}, {ponto.longitude}</p>}
-            <Link to="/pontos">voltar</Link>
-        </>
-        
-    );
-    
+  return (
+    <section className="pagina">
+      <div className="acoes-cabecalho"><Link className="botao botao-secundario" to="/pontos">← Voltar aos pontos</Link><Link className="botao botao-secundario" to={`/pontos/${id}/editar`}>Editar ponto</Link><button className="botao botao-secundario botao-excluir" onClick={handleExcluir} aria-label="Excluir ponto">Excluir</button></div>
+      <h1 className="titulo-detalhe">{ponto.name}</h1>
+      <p className="texto-secundario descricao-detalhe">{ponto.description || "Ponto geográfico cadastrado."}</p>
+      {erro && <p className="aviso aviso-erro" role="alert">{erro}</p>}
+      <div className="detalhe-layout">
+        <MapaDecorativo className="mapa-detalhe" rotulo="Mapa ilustrativo" />
+        <dl className="detalhes-card">
+          <dt className="cabecalho-informacoes">INFORMAÇÕES DO PONTO</dt>
+          <div><dt>Nome</dt><dd>{ponto.name}</dd></div>
+          <div><dt>Descrição</dt><dd>{ponto.description || "Sem descrição"}</dd></div>
+          <div><dt>Latitude</dt><dd>{ponto.latitude}</dd></div>
+          <div><dt>Longitude</dt><dd>{ponto.longitude}</dd></div>
+        </dl>
+      </div>
+    </section>
+  );
 }
 
 export default DetalhePonto;
