@@ -41,7 +41,9 @@ td { height: 66px; border-bottom: 1px solid #ededed; }
 tbody tr:last-child td { border-bottom: 0; }
 .link-nome { display: block; color: #171717; font-weight: 700; text-decoration: none; }
 .link-nome:hover { text-decoration: underline; }
-.descricao-ponto { display: block; max-width: 300px; margin-top: 4px; overflow: hidden; color: #777; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.tabela-conteiner th:first-child { min-width: 150px; }
+.tabela-conteiner th:nth-child(2) { min-width: 220px; }
+.tabela-conteiner td[data-label="Descrição"] { max-width: 360px; color: #666; }
 .acoes { white-space: nowrap; }
 .acoes a, .acoes .botao-texto { min-width: 64px; min-height: 38px; margin-right: 8px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #777; border-radius: 5px; padding: 0 10px; color: #171717; background: #fff; font-size: 12px; text-decoration: none; }
 .acoes a:hover, .acoes .botao-texto:hover { background: #f4f4f4; }
@@ -84,10 +86,12 @@ tbody tr:last-child td { border-bottom: 0; }
   thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
   tbody { display: grid; gap: 12px; }
   tbody tr { border: 1px solid #e2e2e2; border-radius: 6px; padding: 12px; }
-  td { display: inline-block; width: auto; height: auto; min-height: 32px; border: 0; padding: 5px 8px 5px 0; }
-  td:first-child { display: block; }
-  .descricao-ponto { white-space: normal; }
-  td.acoes { display: flex; flex-wrap: wrap; padding-top: 10px; }
+  td { display: grid; grid-template-columns: 90px minmax(0, 1fr); width: 100%; height: auto; min-height: 32px; border: 0; padding: 5px 0; }
+  td::before { content: attr(data-label); color: #777; font-size: 11px; font-weight: 650; text-transform: uppercase; }
+  td:first-child { display: grid; }
+  .tabela-conteiner td[data-label="Descrição"] { max-width: none; }
+  td.acoes { display: block; padding-top: 10px; }
+  td.acoes::before { display: block; margin-bottom: 7px; }
   .acoes a, .acoes .botao-texto { margin: 0 6px 4px 0; }
   .form-layout { grid-template-columns: 1fr; padding: 16px 0; }
   .formulario { order: 1; }

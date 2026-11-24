@@ -9,22 +9,32 @@ function ListaPontos() {
   const [ordemAscendente, setOrdemAscendente] = useState(true);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
-
-  async function carregarPontos() {
-    setCarregando(true);
-    setErro("");
-    try {
-      setPontos(await listarPontos());
-    } catch (error) {
-      setErro(error.message || "Não foi possível carregar os pontos.");
-    } finally {
-      setCarregando(false);
-    }
-  }
+  const [recarregar, setRecarregar] = useState(0);
 
   useEffect(() => {
-    carregarPontos();
-  }, []);
+    let ativo = true;
+
+    listarPontos()
+      .then((dados) => {
+        if (ativo) setPontos(dados);
+      })
+      .catch((error) => {
+        if (ativo) setErro(error.message || "Não foi possível carregar os pontos.");
+      })
+      .finally(() => {
+        if (ativo) setCarregando(false);
+      });
+
+    return () => {
+      ativo = false;
+    };
+  }, [recarregar]);
+
+  function tentarNovamente() {
+    setErro("");
+    setCarregando(true);
+    setRecarregar((numero) => numero + 1);
+  }
 
   const pontosFiltrados = useMemo(() => {
     const termo = filtro.trim().toLocaleLowerCase("pt-BR");
@@ -64,18 +74,20 @@ function ListaPontos() {
 
       <MapaPontos className="mapa-lista" pontos={pontos} rotulo="Mapa dos pontos cadastrados" />
 
-      {erro && <p className="aviso aviso-erro" role="alert">{erro} <button className="botao-texto" onClick={carregarPontos}>Tentar novamente</button></p>}
+      {erro && <p className="aviso aviso-erro" role="alert">{erro} <button className="botao-texto" onClick={tentarNovamente}>Tentar novamente</button></p>}
       {carregando ? <p className="aviso">Carregando pontos...</p> : !erro && pontosFiltrados.length === 0 ? <p className="aviso">{pontos.length === 0 ? "Nenhum ponto cadastrado." : "Nenhum ponto encontrado para esse filtro."}</p> : null}
 
       {!carregando && !erro && pontosFiltrados.length > 0 && (
         <div className="tabela-conteiner">
           <table>
-            <thead><tr><th>Ponto</th><th>Latitude</th><th>Longitude</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Nome</th><th>Descrição</th><th>Latitude</th><th>Longitude</th><th>Ações</th></tr></thead>
             <tbody>{pontosFiltrados.map((ponto) => (
               <tr key={ponto.id}>
-                <td><Link className="link-nome" to={`/pontos/${ponto.id}`}>{ponto.name}</Link><span className="descricao-ponto">{ponto.description || "Sem descrição"}</span></td>
-                <td>{Number(ponto.latitude).toFixed(4)}</td><td>{Number(ponto.longitude).toFixed(4)}</td>
-                <td className="acoes"><Link to={`/pontos/${ponto.id}`}>Ver</Link><Link to={`/pontos/${ponto.id}/editar`}>Editar</Link><button className="botao-texto botao-perigo" onClick={() => handleExcluir(ponto)}>Excluir</button></td>
+                <td data-label="Nome"><Link className="link-nome" to={`/pontos/${ponto.id}`}>{ponto.name}</Link></td>
+                <td data-label="Descrição">{ponto.description || "Sem descrição"}</td>
+                <td data-label="Latitude">{Number(ponto.latitude).toFixed(4)}</td>
+                <td data-label="Longitude">{Number(ponto.longitude).toFixed(4)}</td>
+                <td className="acoes" data-label="Ações"><Link to={`/pontos/${ponto.id}`}>Ver</Link><Link to={`/pontos/${ponto.id}/editar`}>Editar</Link><button className="botao-texto botao-perigo" onClick={() => handleExcluir(ponto)}>Excluir</button></td>
               </tr>
             ))}</tbody>
           </table>
