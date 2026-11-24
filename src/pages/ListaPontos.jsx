@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { excluirPonto, listarPontos } from "../services/api.js";
-import MapaDecorativo from "../components/MapaDecorativo.jsx";
+import MapaPontos from "../components/MapaPontos.jsx";
 
 function ListaPontos() {
   const [pontos, setPontos] = useState([]);
@@ -62,7 +62,7 @@ function ListaPontos() {
         Ordenar por nome {ordemAscendente ? "↑" : "↓"}
       </button>
 
-      <MapaDecorativo className="mapa-lista" rotulo="Pontos salvos" />
+      <MapaPontos className="mapa-lista" pontos={pontos} rotulo="Mapa dos pontos cadastrados" />
 
       {erro && <p className="aviso aviso-erro" role="alert">{erro} <button className="botao-texto" onClick={carregarPontos}>Tentar novamente</button></p>}
       {carregando ? <p className="aviso">Carregando pontos...</p> : !erro && pontosFiltrados.length === 0 ? <p className="aviso">{pontos.length === 0 ? "Nenhum ponto cadastrado." : "Nenhum ponto encontrado para esse filtro."}</p> : null}

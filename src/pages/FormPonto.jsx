@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { atualizarPonto, buscarPonto, criarPonto } from "../services/api.js";
-import MapaDecorativo from "../components/MapaDecorativo.jsx";
+import MapaPontos from "../components/MapaPontos.jsx";
 
 const inicial = { name: "", description: "", latitude: "", longitude: "" };
 
@@ -12,6 +12,12 @@ function FormPonto() {
   const [carregando, setCarregando] = useState(Boolean(id));
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState("");
+  const pontosPreview = useMemo(() => {
+    const latitude = formulario.latitude === "" ? NaN : Number(formulario.latitude);
+    const longitude = formulario.longitude === "" ? NaN : Number(formulario.longitude);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) return [];
+    return [{ name: formulario.name || "Novo ponto", description: formulario.description, latitude, longitude }];
+  }, [formulario.description, formulario.latitude, formulario.longitude, formulario.name]);
 
   useEffect(() => {
     if (!id) return;
@@ -73,7 +79,7 @@ function FormPonto() {
           <div className="acoes-formulario"><button className="botao botao-principal" type="submit" disabled={salvando}>{salvando ? "Salvando..." : id ? "Salvar alterações" : "Cadastrar ponto"}</button><Link className="botao botao-secundario" to={id ? `/pontos/${id}` : "/pontos"}>Cancelar</Link></div>
           <p className="campos-obrigatorios">* Campos obrigatórios</p>
         </form>
-        <aside className="previsao-localizacao"><p>PRÉVIA DA LOCALIZAÇÃO</p><MapaDecorativo className="mapa-formulario" rotulo="Prévia ilustrativa" /><span>As coordenadas identificam a posição do ponto.</span></aside>
+        <aside className="previsao-localizacao"><p>PRÉVIA DA LOCALIZAÇÃO</p><MapaPontos className="mapa-formulario" pontos={pontosPreview} centro={pontosPreview.length ? [pontosPreview[0].latitude, pontosPreview[0].longitude] : undefined} zoom={14} rotulo="Prévia do ponto no mapa" /><span>{pontosPreview.length ? "O marcador acompanha as coordenadas informadas." : "Informe latitude e longitude para posicionar o marcador."}</span></aside>
       </div>
     </section>
   );

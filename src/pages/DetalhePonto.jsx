@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { buscarPonto, excluirPonto } from "../services/api.js";
-import MapaDecorativo from "../components/MapaDecorativo.jsx";
+import MapaPontos from "../components/MapaPontos.jsx";
 
 function DetalhePonto() {
   const { id } = useParams();
@@ -40,7 +40,7 @@ function DetalhePonto() {
       <p className="texto-secundario descricao-detalhe">{ponto.description || "Ponto geográfico cadastrado."}</p>
       {erro && <p className="aviso aviso-erro" role="alert">{erro}</p>}
       <div className="detalhe-layout">
-        <MapaDecorativo className="mapa-detalhe" rotulo="Mapa ilustrativo" />
+        <MapaPontos className="mapa-detalhe" pontos={[ponto]} centro={[Number(ponto.latitude), Number(ponto.longitude)]} zoom={14} rotulo={`Mapa de ${ponto.name}`} />
         <dl className="detalhes-card">
           <dt className="cabecalho-informacoes">INFORMAÇÕES DO PONTO</dt>
           <div><dt>Nome</dt><dd>{ponto.name}</dd></div>
