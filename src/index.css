@@ -9,7 +9,20 @@
   font-weight: 400;
 }
 
-* { box-sizing: border-box; }
-body { min-width: 320px; min-height: 100vh; margin: 0; }
-button, input, textarea { font: inherit; }
-#root { min-height: 100vh; }
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+button, input, textarea {
+  font: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
