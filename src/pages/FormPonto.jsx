@@ -3,37 +3,76 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { atualizarPonto, buscarPonto, criarPonto } from "../services/api.js";
 import MapaPontos from "../components/MapaPontos.jsx";
 
-const inicial = { name: "", description: "", latitude: "", longitude: "" };
+const inicial = { 
+    name: "", 
+    description: "", 
+    latitude: "", 
+    longitude: "" };
 
 function FormPonto() {
-  const { id } = useParams();
+  const { id } = useParams(); // identifica se é cadastro ou edição de ponto
   const navigate = useNavigate();
   const [formulario, setFormulario] = useState(inicial);
   const [carregando, setCarregando] = useState(Boolean(id));
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState("");
   const pontosPreview = useMemo(() => {
-    const latitude = formulario.latitude === "" ? NaN : Number(formulario.latitude);
-    const longitude = formulario.longitude === "" ? NaN : Number(formulario.longitude);
-    if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) return [];
-    return [{ name: formulario.name || "Novo ponto", description: formulario.description, latitude, longitude }];
-  }, [formulario.description, formulario.latitude, formulario.longitude, formulario.name]);
+    const latitude =
+      formulario.latitude === "" ? NaN : Number(formulario.latitude);
+    const longitude =
+      formulario.longitude === "" ? NaN : Number(formulario.longitude);
+    if (
+      !Number.isFinite(latitude) ||
+      !Number.isFinite(longitude) ||
+      latitude < -90 ||
+      latitude > 90 ||
+      longitude < -180 ||
+      longitude > 180
+    )
+      return [];
+    return [
+      {
+        name: formulario.name || "Novo ponto",
+        description: formulario.description,
+        latitude,
+        longitude,
+      },
+    ];
+  }, [
+    formulario.description,
+    formulario.latitude,
+    formulario.longitude,
+    formulario.name,
+  ]);
 
   useEffect(() => {
     if (!id) return;
     let ativo = true;
     buscarPonto(id)
       .then((ponto) => {
-        if (ativo) setFormulario({ name: ponto.name ?? "", description: ponto.description ?? "", latitude: String(ponto.latitude ?? ""), longitude: String(ponto.longitude ?? "") });
+        if (ativo)
+          setFormulario({
+            name: ponto.name ?? "",
+            description: ponto.description ?? "",
+            latitude: String(ponto.latitude ?? ""),
+            longitude: String(ponto.longitude ?? ""), // seta os dados se achar id
+          });
       })
-      .catch((error) => { if (ativo) setErro(error.message || "Não foi possível carregar o ponto."); })
-      .finally(() => { if (ativo) setCarregando(false); });
-    return () => { ativo = false; };
+      .catch((error) => {
+        if (ativo)
+          setErro(error.message || "Não foi possível carregar o ponto.");
+      })
+      .finally(() => {
+        if (ativo) setCarregando(false);
+      });
+    return () => {
+      ativo = false;
+    };
   }, [id]);
 
   function alterarCampo(event) {
     setFormulario({ ...formulario, [event.target.name]: event.target.value });
-  }
+  } // guarda os campos q ja tem e depois altera o modificado
 
   async function salvar(event) {
     event.preventDefault();
@@ -41,16 +80,39 @@ function FormPonto() {
     const nome = formulario.name.trim();
     const latitude = Number(formulario.latitude);
     const longitude = Number(formulario.longitude);
+
+
     if (!nome) return setErro("Informe o nome do ponto.");
-    if (nome.length > 100) return setErro("O nome deve ter no máximo 100 caracteres.");
-    if (formulario.description.length > 255) return setErro("A descrição deve ter no máximo 255 caracteres.");
-    if (formulario.latitude === "" || !Number.isFinite(latitude) || latitude < -90 || latitude > 90) return setErro("Informe uma latitude entre -90 e 90.");
-    if (formulario.longitude === "" || !Number.isFinite(longitude) || longitude < -180 || longitude > 180) return setErro("Informe uma longitude entre -180 e 180.");
+    if (nome.length > 100)
+      return setErro("O nome deve ter no máximo 100 caracteres.");
+    if (formulario.description.length > 255)
+      return setErro("A descrição deve ter no máximo 255 caracteres.");
+    if (
+      formulario.latitude === "" ||
+      !Number.isFinite(latitude) ||
+      latitude < -90 ||
+      latitude > 90
+    )
+      return setErro("Informe uma latitude entre -90 e 90.");
+    if (
+      formulario.longitude === "" ||
+      !Number.isFinite(longitude) ||
+      longitude < -180 ||
+      longitude > 180
+    )
+      return setErro("Informe uma longitude entre -180 e 180.");
 
     setSalvando(true);
-    const ponto = { name: nome, description: formulario.description.trim(), latitude, longitude };
+    const ponto = {
+      name: nome,
+      description: formulario.description.trim(),
+      latitude,
+      longitude,
+    };
     try {
-      const salvo = id ? await atualizarPonto(id, ponto) : await criarPonto(ponto);
+      const salvo = id
+        ? await atualizarPonto(id, ponto) // se tiver id atualiza  se nao cadastra.
+        : await criarPonto(ponto);
       navigate(id ? `/pontos/${id}` : `/pontos/${salvo.id}`, { replace: true });
     } catch (error) {
       setErro(error.message || "Não foi possível salvar o ponto.");
@@ -59,27 +121,138 @@ function FormPonto() {
     }
   }
 
-  if (carregando) return <section className="pagina"><p className="aviso">Carregando ponto...</p></section>;
-
+  if (carregando)
+    return (
+      <section className="pagina">
+        <p className="aviso">Carregando ponto...</p>
+      </section>
+    );
+    
   return (
     <section className="pagina pagina-formulario">
-      <nav className="breadcrumb" aria-label="Trilha de navegação"><Link to="/pontos">Pontos</Link><span>/</span><span>{id ? "Editar ponto" : "Novo ponto"}</span></nav>
+      <nav className="breadcrumb" aria-label="Trilha de navegação">
+        <Link to="/pontos">Pontos</Link>
+        <span>/</span>
+        <span>{id ? "Editar ponto" : "Novo ponto"}</span>
+      </nav>
       <h1>{id ? "Editar ponto" : "Novo ponto"}</h1>
-      <p className="texto-secundario">{id ? "Atualize os dados do ponto geográfico." : "Cadastre um local com nome, descrição e coordenadas."}</p>
-      {erro && <p className="aviso aviso-erro" role="alert">{erro}</p>}
+      <p className="texto-secundario"> // oq aparece na tela
+        {id
+          ? "Atualize os dados do ponto geográfico."
+          : "Cadastre um local com nome, descrição e coordenadas."}
+      </p>
+      {erro && (
+        <p className="aviso aviso-erro" role="alert">
+          {erro}
+        </p>
+      )}
       <div className="form-layout">
         <form className="formulario" onSubmit={salvar}>
-          <label className="campo" htmlFor="name"><span>Nome do ponto <b>*</b></span><input id="name" name="name" placeholder="Ex.: Mirante do Parque" required maxLength={100} value={formulario.name} onChange={alterarCampo} /></label>
-          <label className="campo" htmlFor="description"><span>Descrição</span><textarea id="description" name="description" placeholder="Descreva este local" maxLength={255} rows={3} value={formulario.description} onChange={alterarCampo} /></label>
+          <label className="campo" htmlFor="name">
+            <span>
+              Nome do ponto <b>*</b>
+            </span>
+            <input
+              id="name"
+              name="name"
+              placeholder="Ex.: Mirante do Parque"
+              required
+              maxLength={100}
+              value={formulario.name}
+              onChange={alterarCampo}
+            />
+          </label>
+          <label className="campo" htmlFor="description">
+            <span>Descrição</span>
+            <textarea
+              id="description"
+              name="description"
+              placeholder="Descreva este local"
+              maxLength={255}
+              rows={3}
+              value={formulario.description}
+              onChange={alterarCampo}
+            />
+          </label>
           <div className="campos-duplos">
-            <label className="campo" htmlFor="latitude"><span>Latitude <b>*</b></span><input id="latitude" name="latitude" type="number" step="any" min="-90" max="90" placeholder="-28.2624" required value={formulario.latitude} onChange={alterarCampo} /></label>
-            <label className="campo" htmlFor="longitude"><span>Longitude <b>*</b></span><input id="longitude" name="longitude" type="number" step="any" min="-180" max="180" placeholder="-52.4087" required value={formulario.longitude} onChange={alterarCampo} /></label>
+            <label className="campo" htmlFor="latitude">
+              <span>
+                Latitude <b>*</b>
+              </span>
+              <input
+                id="latitude"
+                name="latitude"
+                type="number"
+                step="any"
+                min="-90"
+                max="90"
+                placeholder="-28.2624"
+                required
+                value={formulario.latitude}
+                onChange={alterarCampo}
+              />
+            </label>
+            <label className="campo" htmlFor="longitude">
+              <span>
+                Longitude <b>*</b>
+              </span>
+              <input
+                id="longitude"
+                name="longitude"
+                type="number"
+                step="any"
+                min="-180"
+                max="180"
+                placeholder="-52.4087"
+                required
+                value={formulario.longitude}
+                onChange={alterarCampo}
+              />
+            </label>
           </div>
-          <p className="dica-coordenadas">◎ &nbsp; Coordenadas em graus decimais</p>
-          <div className="acoes-formulario"><button className="botao botao-principal" type="submit" disabled={salvando}>{salvando ? "Salvando..." : id ? "Salvar alterações" : "Cadastrar ponto"}</button><Link className="botao botao-secundario" to={id ? `/pontos/${id}` : "/pontos"}>Cancelar</Link></div>
+          <p className="dica-coordenadas">
+            ◎ &nbsp; Coordenadas em graus decimais
+          </p>
+          <div className="acoes-formulario">
+            <button
+              className="botao botao-principal"
+              type="submit"
+              disabled={salvando}
+            >
+              {salvando
+                ? "Salvando..."
+                : id
+                  ? "Salvar alterações"
+                  : "Cadastrar ponto"}
+            </button>
+            <Link
+              className="botao botao-secundario"
+              to={id ? `/pontos/${id}` : "/pontos"}
+            >
+              Cancelar
+            </Link>
+          </div>
           <p className="campos-obrigatorios">* Campos obrigatórios</p>
         </form>
-        <aside className="previsao-localizacao"><p>PRÉVIA DA LOCALIZAÇÃO</p><MapaPontos className="mapa-formulario" pontos={pontosPreview} centro={pontosPreview.length ? [pontosPreview[0].latitude, pontosPreview[0].longitude] : undefined} zoom={14} rotulo="Prévia do ponto no mapa" /><span>{pontosPreview.length ? "O marcador acompanha as coordenadas informadas." : "Informe latitude e longitude para posicionar o marcador."}</span></aside>
+        <aside className="previsao-localizacao">
+          <p>PRÉVIA DA LOCALIZAÇÃO</p>
+          <MapaPontos
+            className="mapa-formulario"
+            pontos={pontosPreview}
+            centro={
+              pontosPreview.length
+                ? [pontosPreview[0].latitude, pontosPreview[0].longitude]
+                : undefined
+            }
+            zoom={14}
+            rotulo="Prévia do ponto no mapa"
+          />
+          <span>
+            {pontosPreview.length
+              ? "O marcador acompanha as coordenadas informadas."
+              : "Informe latitude e longitude para posicionar o marcador."}
+          </span>
+        </aside>
       </div>
     </section>
   );

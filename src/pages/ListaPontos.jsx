@@ -19,7 +19,8 @@ function ListaPontos() {
         if (ativo) setPontos(dados);
       })
       .catch((error) => {
-        if (ativo) setErro(error.message || "Não foi possível carregar os pontos.");
+        if (ativo)
+          setErro(error.message || "Não foi possível carregar os pontos.");
       })
       .finally(() => {
         if (ativo) setCarregando(false);
@@ -33,15 +34,23 @@ function ListaPontos() {
   function tentarNovamente() {
     setErro("");
     setCarregando(true);
-    setRecarregar((numero) => numero + 1);
+    setRecarregar((numero) => numero + 1); // executa o useEffect dnv
   }
 
   const pontosFiltrados = useMemo(() => {
     const termo = filtro.trim().toLocaleLowerCase("pt-BR");
     return pontos
-      .filter((ponto) => `${ponto.name} ${ponto.description || ""}`.toLocaleLowerCase("pt-BR").includes(termo))
-      .sort((a, b) => ordemAscendente ? a.name.localeCompare(b.name, "pt-BR") : b.name.localeCompare(a.name, "pt-BR"));
-  }, [filtro, ordemAscendente, pontos]);
+      .filter((ponto) =>
+        `${ponto.name} ${ponto.description || ""}`
+          .toLocaleLowerCase("pt-BR")
+          .includes(termo),
+      )
+      .sort((a, b) =>
+        ordemAscendente
+          ? a.name.localeCompare(b.name, "pt-BR")
+          : b.name.localeCompare(a.name, "pt-BR"), 
+      );
+  }, [filtro, ordemAscendente, pontos]); // ordena sempre q a lista de pontos mudar ou o filtro ou a ordem
 
   async function handleExcluir(ponto) {
     if (!window.confirm(`Deseja excluir o ponto "${ponto.name}"?`)) return;
@@ -59,37 +68,99 @@ function ListaPontos() {
       <div className="titulo-linha">
         <div>
           <h1>Pontos geográficos</h1>
-          <p className="texto-secundario">Visualize e organize os locais cadastrados.</p>
+          <p className="texto-secundario">
+            Visualize e organize os locais cadastrados.
+          </p>
         </div>
-        <Link className="botao botao-principal" to="/pontos/novo">+ Novo ponto</Link>
+        <Link className="botao botao-principal" to="/pontos/novo">
+          + Novo ponto
+        </Link>
       </div>
 
       <label className="campo campo-filtro" htmlFor="filtro-pontos">
         <span>Buscar</span>
-        <input id="filtro-pontos" type="search" placeholder="Busque por nome ou descrição" value={filtro} onChange={(event) => setFiltro(event.target.value)} />
+        <input
+          id="filtro-pontos"
+          type="search"
+          placeholder="Busque por nome ou descrição"
+          value={filtro}
+          onChange={(event) => setFiltro(event.target.value)}
+        />
       </label>
-      <button className="botao botao-secundario botao-ordenar" type="button" onClick={() => setOrdemAscendente((ordem) => !ordem)}>
+      <button
+        className="botao botao-secundario botao-ordenar"
+        type="button"
+        onClick={() => setOrdemAscendente((ordem) => !ordem)}
+      >
         Ordenar por nome {ordemAscendente ? "↑" : "↓"}
       </button>
 
-      <MapaPontos className="mapa-lista" pontos={pontos} rotulo="Mapa dos pontos cadastrados" />
+      <MapaPontos
+        className="mapa-lista"
+        pontos={pontos}
+        rotulo="Mapa dos pontos cadastrados"
+      />
 
-      {erro && <p className="aviso aviso-erro" role="alert">{erro} <button className="botao-texto" onClick={tentarNovamente}>Tentar novamente</button></p>}
-      {carregando ? <p className="aviso">Carregando pontos...</p> : !erro && pontosFiltrados.length === 0 ? <p className="aviso">{pontos.length === 0 ? "Nenhum ponto cadastrado." : "Nenhum ponto encontrado para esse filtro."}</p> : null}
+      {erro && (
+        <p className="aviso aviso-erro" role="alert">
+          {erro}{" "}
+          <button className="botao-texto" onClick={tentarNovamente}>
+            Tentar novamente
+          </button>
+        </p>
+      )}
+      {carregando ? (
+        <p className="aviso">Carregando pontos...</p>
+      ) : !erro && pontosFiltrados.length === 0 ? (
+        <p className="aviso">
+          {pontos.length === 0
+            ? "Nenhum ponto cadastrado."
+            : "Nenhum ponto encontrado para esse filtro."}
+        </p>
+      ) : null}
 
       {!carregando && !erro && pontosFiltrados.length > 0 && (
         <div className="tabela-conteiner">
           <table>
-            <thead><tr><th>Nome</th><th>Descrição</th><th>Latitude</th><th>Longitude</th><th>Ações</th></tr></thead>
-            <tbody>{pontosFiltrados.map((ponto) => (
-              <tr key={ponto.id}>
-                <td data-label="Nome"><Link className="link-nome" to={`/pontos/${ponto.id}`}>{ponto.name}</Link></td>
-                <td data-label="Descrição">{ponto.description || "Sem descrição"}</td>
-                <td data-label="Latitude">{Number(ponto.latitude).toFixed(4)}</td>
-                <td data-label="Longitude">{Number(ponto.longitude).toFixed(4)}</td>
-                <td className="acoes" data-label="Ações"><Link to={`/pontos/${ponto.id}`}>Ver</Link><Link to={`/pontos/${ponto.id}/editar`}>Editar</Link><button className="botao-texto botao-perigo" onClick={() => handleExcluir(ponto)}>Excluir</button></td>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Ações</th>
               </tr>
-            ))}</tbody>
+            </thead>
+            <tbody>
+              {pontosFiltrados.map((ponto) => (
+                <tr key={ponto.id}>
+                  <td data-label="Nome">
+                    <Link className="link-nome" to={`/pontos/${ponto.id}`}>
+                      {ponto.name}
+                    </Link>
+                  </td>
+                  <td data-label="Descrição">
+                    {ponto.description || "Sem descrição"}
+                  </td>
+                  <td data-label="Latitude">
+                    {Number(ponto.latitude).toFixed(4)}
+                  </td>
+                  <td data-label="Longitude">
+                    {Number(ponto.longitude).toFixed(4)}
+                  </td>
+                  <td className="acoes" data-label="Ações">
+                    <Link to={`/pontos/${ponto.id}`}>Ver</Link>
+                    <Link to={`/pontos/${ponto.id}/editar`}>Editar</Link>
+                    <button
+                      className="botao-texto botao-perigo"
+                      onClick={() => handleExcluir(ponto)}
+                    >
+                      Excluir
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
       )}

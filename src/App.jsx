@@ -16,7 +16,17 @@ function App() {
           <Route path="/pontos/novo" element={<FormPonto />} />
           <Route path="/pontos/:id/editar" element={<FormPonto />} />
           <Route path="/pontos/:id" element={<DetalhePonto />} />
-          <Route path="*" element={<section className="pagina"><h1>Página não encontrada</h1><Link className="botao botao-principal" to="/pontos">Voltar para os pontos</Link></section>} />
+          <Route
+            path="*"
+            element={
+              <section className="pagina">
+                <h1>Página não encontrada</h1> //pag n encontrada
+                <Link className="botao botao-principal" to="/pontos">
+                  Voltar para os pontos
+                </Link>
+              </section>
+            }
+          />
         </Routes>
       </main>
     </>
