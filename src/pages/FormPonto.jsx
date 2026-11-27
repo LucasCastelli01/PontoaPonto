@@ -29,10 +29,10 @@ function FormPonto() {
       longitude < -180 ||
       longitude > 180
     )
-      return [];
+      return []; // se algo for invalido retorna sem ponto
     return [
       {
-        name: formulario.name || "Novo ponto",
+        name: formulario.name || "Novo ponto", // se nao tiver nome mostra novo ponto
         description: formulario.description,
         latitude,
         longitude,
@@ -48,7 +48,7 @@ function FormPonto() {
   useEffect(() => {
     if (!id) return;
     let ativo = true;
-    buscarPonto(id)
+    buscarPonto(id) // busca na api
       .then((ponto) => {
         if (ativo)
           setFormulario({
@@ -74,7 +74,7 @@ function FormPonto() {
     setFormulario({ ...formulario, [event.target.name]: event.target.value });
   } // guarda os campos q ja tem e depois altera o modificado
 
-  async function salvar(event) {
+  async function salvar(event) { // faz validacao para salvar os dados
     event.preventDefault();
     setErro("");
     const nome = formulario.name.trim();
@@ -128,7 +128,7 @@ function FormPonto() {
       </section>
     );
     
-  return (
+  return ( // oq aparece na tela
     <section className="pagina pagina-formulario">
       <nav className="breadcrumb" aria-label="Trilha de navegação">
         <Link to="/pontos">Pontos</Link>
@@ -136,7 +136,7 @@ function FormPonto() {
         <span>{id ? "Editar ponto" : "Novo ponto"}</span>
       </nav>
       <h1>{id ? "Editar ponto" : "Novo ponto"}</h1>
-      <p className="texto-secundario"> // oq aparece na tela
+      <p className="texto-secundario"> 
         {id
           ? "Atualize os dados do ponto geográfico."
           : "Cadastre um local com nome, descrição e coordenadas."}
@@ -206,7 +206,7 @@ function FormPonto() {
                 placeholder="-52.4087"
                 required
                 value={formulario.longitude}
-                onChange={alterarCampo}
+                onChange={alterarCampo} // atualiza o estado quando a pessoa digitar
               />
             </label>
           </div>
@@ -228,6 +228,7 @@ function FormPonto() {
             <Link
               className="botao botao-secundario"
               to={id ? `/pontos/${id}` : "/pontos"}
+              // volta para a lista de pontos
             >
               Cancelar
             </Link>

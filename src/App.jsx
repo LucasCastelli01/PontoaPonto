@@ -20,12 +20,12 @@ function App() {
             path="*"
             element={
               <section className="pagina">
-                <h1>Página não encontrada</h1> //pag n encontrada
+                <h1>Página não encontrada</h1>
                 <Link className="botao botao-principal" to="/pontos">
                   Voltar para os pontos
                 </Link>
-              </section>
-            }
+              </section>  //pag n encontrada
+            } 
           />
         </Routes>
       </main>

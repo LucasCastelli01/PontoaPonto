@@ -61,9 +61,9 @@ function ListaPontos() {
     } catch (error) {
       setErro(error.message || "Não foi possível excluir o ponto.");
     }
-  }
+  } //excluir ponto espera confirmar
 
-  return (
+  return (  // leva pro form de cadastro
     <section className="pagina">
       <div className="titulo-linha">
         <div>
@@ -74,9 +74,9 @@ function ListaPontos() {
         </div>
         <Link className="botao botao-principal" to="/pontos/novo">
           + Novo ponto
-        </Link>
-      </div>
-
+        </Link> 
+      </div> 
+      
       <label className="campo campo-filtro" htmlFor="filtro-pontos">
         <span>Buscar</span>
         <input
@@ -88,7 +88,7 @@ function ListaPontos() {
         />
       </label>
       <button
-        className="botao botao-secundario botao-ordenar"
+        className="botao botao-secundario botao-ordenar" // inverte a ordem de crescente pra decrescente ou contrario
         type="button"
         onClick={() => setOrdemAscendente((ordem) => !ordem)}
       >
@@ -101,13 +101,14 @@ function ListaPontos() {
         rotulo="Mapa dos pontos cadastrados"
       />
 
+      
       {erro && (
         <p className="aviso aviso-erro" role="alert">
           {erro}{" "}
           <button className="botao-texto" onClick={tentarNovamente}>
             Tentar novamente
           </button>
-        </p>
+        </p> // mostra quando da erro
       )}
       {carregando ? (
         <p className="aviso">Carregando pontos...</p>
